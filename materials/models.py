@@ -37,6 +37,18 @@ class Material(models.Model):
     def __str__(self):
         return self.title
 
+    # ДОБАВЛЯЕМ МЕТОД ДЛЯ ПОИСКА - ВСТАВЬ ЭТОТ КОД В КЛАСС Material
+    @classmethod
+    def search(cls, query):
+        """Поиск материалов по названию, описанию и тегам"""
+        from django.db.models import Q
+        return cls.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__icontains=query) |
+            Q(subject__name__icontains=query)
+        )
+
     class Meta:
         verbose_name = 'Материал'
         verbose_name_plural = 'Материалы'

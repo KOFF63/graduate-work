@@ -1,0 +1,69 @@
+{% extends 'materials/base.html' %}
+
+{% block title %}{{ subject.name }} - Учебные материалы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Заголовок предмета -->
+        <div class="d-flex align-items-center mb-4">
+            <div class="material-icon me-3" style="font-size: 3rem;">{{ subject.icon }}</div>
+            <div>
+                <h1 class="mb-1">{{ subject.name }}</h1>
+                <p class="text-muted mb-0">{{ subject.description }}</p>
+            </div>
+        </div>
+
+        <!-- Фильтры по типу материалов -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Фильтровать по типу:</h5>
+                <div class="btn-group" role="group">
+                    <a href="?type=" class="btn btn-outline-primary {% if not current_filter %}active{% endif %}">Все</a>
+                    <a href="?type=pdf" class="btn btn-outline-primary {% if current_filter == 'pdf' %}active{% endif %}">PDF</a>
+                    <a href="?type=video" class="btn btn-outline-primary {% if current_filter == 'video' %}active{% endif %}">Видео</a>
+                    <a href="?type=text" class="btn btn-outline-primary {% if current_filter == 'text' %}active{% endif %}">Текст</a>
+                    <a href="?type=presentation" class="btn btn-outline-primary {% if current_filter == 'presentation' %}active{% endif %}">Презентации</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список материалов -->
+        <h3 class="mb-3">Материалы ({{ materials.count }})</h3>
+
+        {% for material in materials %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">{{ material.title }}</h5>
+                        <p class="card-text">{{ material.description }}</p>
+                        <div class="d-flex gap-3 text-muted small">
+                            <span>Тип: {{ material.get_material_type_display }}</span>
+                            <span>Добавлен: {{ material.upload_date|date:"d.m.Y" }}</span>
+                            <span>Автор: {{ material.uploaded_by.username }}</span>
+                        </div>
+                        {% if material.tags %}
+                        <div class="mt-2">
+                            {% for tag in material.tags.split %}
+                            <span class="badge bg-secondary me-1">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <span class="badge bg-primary fs-6">{{ material.material_type }}</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            {% if current_filter %}
+                Нет материалов типа "{{ current_filter }}" для этого предмета.
+            {% else %}
+                Пока нет материалов для этого предмета.
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

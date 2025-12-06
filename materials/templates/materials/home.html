@@ -20,7 +20,7 @@
                         <div class="material-icon">{{ subject.icon }}</div>
                         <h5 class="card-title">{{ subject.name }}</h5>
                         <p class="card-text text-muted small">{{ subject.description|truncatewords:8 }}</p>
-                        <button class="btn btn-outline-primary">Смотреть материалы</button>
+                        <a href="{% url 'subject_materials' subject.id %}" class="btn btn-outline-primary">Смотреть материалы</a>
                     </div>
                 </div>
             </div>
