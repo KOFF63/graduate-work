@@ -19,11 +19,16 @@
             <div class="card-body">
                 <h5 class="card-title">Фильтровать по типу:</h5>
                 <div class="btn-group" role="group">
-                    <a href="?type=" class="btn btn-outline-primary {% if not current_filter %}active{% endif %}">Все</a>
-                    <a href="?type=pdf" class="btn btn-outline-primary {% if current_filter == 'pdf' %}active{% endif %}">PDF</a>
-                    <a href="?type=video" class="btn btn-outline-primary {% if current_filter == 'video' %}active{% endif %}">Видео</a>
-                    <a href="?type=text" class="btn btn-outline-primary {% if current_filter == 'text' %}active{% endif %}">Текст</a>
-                    <a href="?type=presentation" class="btn btn-outline-primary {% if current_filter == 'presentation' %}active{% endif %}">Презентации</a>
+                    <a href="?type="
+                       class="btn btn-outline-primary {% if not current_filter %}active{% endif %}">Все</a>
+                    <a href="?type=pdf"
+                       class="btn btn-outline-primary {% if current_filter == 'pdf' %}active{% endif %}">PDF</a>
+                    <a href="?type=video"
+                       class="btn btn-outline-primary {% if current_filter == 'video' %}active{% endif %}">Видео</a>
+                    <a href="?type=text"
+                       class="btn btn-outline-primary {% if current_filter == 'text' %}active{% endif %}">Текст</a>
+                    <a href="?type=presentation"
+                       class="btn btn-outline-primary {% if current_filter == 'presentation' %}active{% endif %}">Презентации</a>
                 </div>
             </div>
         </div>
@@ -41,7 +46,13 @@
                         <div class="d-flex gap-3 text-muted small">
                             <span>Тип: {{ material.get_material_type_display }}</span>
                             <span>Добавлен: {{ material.upload_date|date:"d.m.Y" }}</span>
-                            <span>Автор: {{ material.uploaded_by.username }}</span>
+                            <span>Автор:
+    {% if material.uploaded_by.first_name or material.uploaded_by.last_name %}
+        {{ material.uploaded_by.first_name }} {{ material.uploaded_by.last_name }}
+    {% else %}
+        {{ material.uploaded_by.username }}
+    {% endif %}
+</span>
                         </div>
                         {% if material.tags %}
                         <div class="mt-2">
@@ -58,9 +69,9 @@
         {% empty %}
         <div class="alert alert-info">
             {% if current_filter %}
-                Нет материалов типа "{{ current_filter }}" для этого предмета.
+            Нет материалов типа "{{ current_filter }}" для этого предмета.
             {% else %}
-                Пока нет материалов для этого предмета.
+            Пока нет материалов для этого предмета.
             {% endif %}
         </div>
         {% endfor %}
