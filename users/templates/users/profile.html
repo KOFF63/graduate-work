@@ -3,43 +3,115 @@
 {% block title %}Мой профиль{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row animate-fade-in">
     <!-- Левая колонка - информация профиля -->
     <div class="col-lg-4">
-        <div class="card mb-4">
+        <!-- Карточка профиля -->
+        <div class="card mb-4 hover-lift">
             <div class="card-body text-center">
-                {% if user.userprofile.avatar %}
-                    <img src="{{ user.userprofile.avatar.url }}" alt="Аватар"
-                         class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
-                {% else %}
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                <!-- Аватар пользователя -->
+                <div class="mb-4">
+                    {% if user.userprofile.avatar %}
+                    <img src="{{ user.userprofile.avatar.url }}"
+                         alt="Аватар пользователя {{ user.username }}"
+                         class="rounded-circle img-fluid border"
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                    <div class="d-inline-flex align-items-center justify-content-center
+                                    rounded-circle bg-primary text-white"
                          style="width: 150px; height: 150px; font-size: 3rem;">
                         {{ user.username|first|upper }}
                     </div>
-                {% endif %}
+                    {% endif %}
+                </div>
 
-                <h3 class="my-3">{{ user.username }}</h3>
-                <p class="text-muted mb-1">{{ user.email }}</p>
-                <p class="mb-0">
-                    <span class="badge bg-info">{{ user.userprofile.role|default:"Пользователь" }}</span>
+                <!-- Основная информация -->
+                <h3 class="mb-2">
+                    {% if user.userprofile.display_name %}
+                    {{ user.userprofile.display_name }}
+                    <small class="text-muted d-block fs-6 mt-1">
+                        @{{ user.username }}
+                    </small>
+                    {% else %}
+                    {{ user.username }}
+                    <small class="text-muted d-block fs-6 mt-1">
+                        <i>Добавьте отображаемое имя в настройках</i>
+                    </small>
+                    {% endif %}
+                </h3>
+
+                {% if user.email %}
+                <p class="text-muted mb-3">
+                    <i class="bi bi-envelope"></i> {{ user.email }}
                 </p>
-
-                {% if user.userprofile.department %}
-                    <p class="text-muted mt-2">{{ user.userprofile.department }}</p>
                 {% endif %}
 
-                <p class="mt-3">Зарегистрирован: {{ user.userprofile.created_at|date:"d.m.Y" }}</p>
+                <!-- Роль пользователя -->
+                <div class="mb-3">
+                    {% if user.userprofile.role == 'student' %}
+                    <span class="badge bg-success fs-6">
+                            <i class="bi bi-mortarboard"></i> Студент
+                        </span>
+                    {% elif user.userprofile.role == 'teacher' %}
+                    <span class="badge bg-info fs-6">
+                            <i class="bi bi-person-badge"></i> Преподаватель
+                        </span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">
+                            <i class="bi bi-person"></i> Пользователь
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Факультет/кафедра -->
+                {% if user.userprofile.department %}
+                <p class="text-muted">
+                    <i class="bi bi-building"></i> {{ user.userprofile.department }}
+                </p>
+                {% endif %}
+
+                <!-- Информация "О себе" -->
+                {% if user.userprofile.bio %}
+                <div class="mt-4">
+                    <h6 class="border-bottom pb-2">О себе</h6>
+                    <p class="text-muted mt-2">{{ user.userprofile.bio|linebreaks }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Статистика -->
+                <div class="mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-calendar"></i> Зарегистрирован:
+                        {{ user.date_joined|date:"d.m.Y" }}
+                    </p>
+                    <p class="text-muted small">
+                        <i class="bi bi-clock-history"></i> Последний вход:
+                        {{ user.last_login|date:"d.m.Y H:i"|default:"Еще не входил" }}
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Статистика -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Статистика</h5>
+        <!-- Статистика материалов -->
+        <div class="card mb-4 hover-lift">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart"></i> Статистика
+                </h5>
             </div>
             <div class="card-body">
-                <p><strong>Материалов загружено:</strong> {{ materials_count }}</p>
-                <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="display-6 text-primary">{{ materials_count }}</div>
+                        <small class="text-muted">Материалов</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-success">
+                            {{ user.date_joined|date:"Y" }}
+                        </div>
+                        <small class="text-muted">Год регистрации</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -47,61 +119,342 @@
     <!-- Правая колонка - редактирование профиля и материалы -->
     <div class="col-lg-8">
         <!-- Форма редактирования профиля -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Редактировать профиль</h5>
+        <div class="card mb-4 hover-lift">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square"></i> Редактировать профиль
+                </h5>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="profileForm">
                     {% csrf_token %}
 
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% if field.errors %}
-                            <div class="alert alert-danger mt-1">
-                                {{ field.errors }}
+                    <!-- Аватар -->
+                    <div class="mb-4">
+                        <label for="avatar" class="form-label">
+                            <i class="bi bi-image"></i> Аватар профиля
+                        </label>
+                        <input type="file"
+                               class="form-control"
+                               id="avatar"
+                               name="avatar"
+                               accept="image/*">
+                        <div class="form-text">
+                            Загрузите изображение для аватара (JPG, PNG, GIF).
+                            Максимальный размер: 2 MB.
+                        </div>
+
+                        {% if user.userprofile.avatar %}
+                        <div class="mt-3">
+                            <p class="mb-1 small text-muted">Текущий аватар:</p>
+                            <img src="{{ user.userprofile.avatar.url }}"
+                                 alt="Текущий аватар"
+                                 class="img-thumbnail"
+                                 style="max-width: 100px;">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="removeAvatar"
+                                       name="remove_avatar">
+                                <label class="form-check-label small" for="removeAvatar">
+                                    Удалить текущий аватар
+                                </label>
                             </div>
+                        </div>
                         {% endif %}
                     </div>
-                    {% endfor %}
+                    <!-- Отображаемое имя -->
+                    <div class="mb-4">
+                        <label for="display_name" class="form-label">
+                            <i class="bi bi-person-circle"></i> Отображаемое имя
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="display_name"
+                               name="display_name"
+                               value="{{ user.userprofile.display_name }}"
+                               placeholder="Введите имя которое будут видеть другие пользователи">
+                        <div class="form-text">
+                            Это имя будут видеть другие пользователи на сайте.
+                            Можно использовать русские буквы и пробелы.
+                        </div>
+                    </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email адрес
+                        </label>
+                        <input type="email"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               value="{{ user.email|default:'' }}"
+                               placeholder="your@email.com">
+                        <div class="form-text">
+                            На этот адрес будут приходить уведомления (если настроены).
+                        </div>
+                    </div>
+
+                    <!-- Логин (только для информации) -->
+                    <div class="mb-4">
+                        <div class="card bg-light">
+                            <div class="card-body py-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Логин для входа:</strong>
+                                    <code>{{ user.username }}</code>
+                                    <span class="ms-2">(нельзя изменить)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Информация "О себе" -->
+                    <div class="mb-4">
+                        <label for="bio" class="form-label">
+                            <i class="bi bi-card-text"></i> О себе
+                        </label>
+                        <textarea class="form-control"
+                                  id="bio"
+                                  name="bio"
+                                  rows="4"
+                                  placeholder="Расскажите о себе, своих интересах, достижениях...">{{ user.userprofile.bio }}</textarea>
+                        <div class="form-text">
+                            Максимум 1000 символов. Вы можете рассказать о своей
+                            специальности, интересах или опыте.
+                        </div>
+                        <div class="mt-1 text-end">
+                            <small class="text-muted" id="bioCounter">
+                                <span id="bioLength">{{ user.userprofile.bio|length }}</span>/1000 символов
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Роль -->
+                    <div class="mb-4">
+                        <label for="role" class="form-label">
+                            <i class="bi bi-person-badge"></i> Роль в системе
+                        </label>
+                        <select class="form-select" id="role" name="role">
+                            <option value="student" {% if user.userprofile.role == 'student' %}selected{% endif %}>
+                            👨‍🎓 Студент
+                            </option>
+                            <option value="teacher" {% if user.userprofile.role == 'teacher' %}selected{% endif %}>
+                            👨‍🏫 Преподаватель
+                            </option>
+                            <option value="other" {% if user.userprofile.role == 'other' or not user.userprofile.role %}selected{% endif %}>
+                            👤 Другое
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            Выберите вашу роль для правильного отображения в системе.
+                        </div>
+                    </div>
+                    <!-- Факультет/кафедра -->
+                    <div class="mb-4">
+                        <label for="department" class="form-label">
+                            <i class="bi bi-building"></i> Факультет / Кафедра
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="department"
+                               name="department"
+                               value="{{ user.userprofile.department }}"
+                               placeholder="Например: Факультет информационных технологий">
+                        <div class="form-text">
+                            Укажите ваш факультет или кафедру для удобства поиска.
+                        </div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary me-2">
+                            <i class="bi bi-x-circle"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Сохранить изменения
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Мои материалы -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Мои материалы ({{ materials_count }})</h5>
-                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">Добавить материал</a>
+        <div class="card hover-lift">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-folder"></i> Мои материалы
+                    <span class="badge bg-primary rounded-pill ms-2">{{ materials_count }}</span>
+                </h5>
+                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle"></i> Добавить материал
+                </a>
             </div>
             <div class="card-body">
-                {% for material in user_materials %}
-                <div class="border-bottom pb-3 mb-3">
-                    <h6 class="mb-1">{{ material.title }}</h6>
-                    <p class="text-muted small mb-2">{{ material.description|truncatewords:15 }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            {{ material.subject.name }} •
-                            {{ material.get_material_type_display }} •
-                            {{ material.upload_date|date:"d.m.Y" }}
-                        </small>
-                        <span class="badge bg-primary">{{ material.material_type }}</span>
+                {% if user_materials %}
+                <div class="list-group list-group-flush">
+                    {% for material in user_materials %}
+                    <div class="list-group-item border-0 px-0 py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    <span class="type-icon">{{ material.get_type_icon }}</span>
+                                    {{ material.title }}
+                                </h6>
+                                <p class="text-muted small mb-2">
+                                    {{ material.description|truncatewords:20 }}
+                                </p>
+                                <div class="d-flex gap-3 small">
+                                        <span class="text-muted">
+                                            <i class="bi bi-book"></i> {{ material.subject.name }}
+                                        </span>
+                                    <span class="text-muted">
+                                            <i class="bi bi-calendar"></i> {{ material.upload_date|date:"d.m.Y" }}
+                                        </span>
+                                    <span class="badge bg-primary">{{ material.get_material_type_display }}</span>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
+                    {% if not forloop.last %}
+                    <hr class="my-1 mx-3">
+                    {% endif %}
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <p class="text-muted text-center">Вы еще не загружали материалы.</p>
-                {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-folder-x" style="font-size: 3rem; color: #6c757d;"></i>
+                    </div>
+                    <h5 class="text-muted">У вас пока нет материалов</h5>
+                    <p class="text-muted mb-4">
+                        Начните добавлять учебные материалы, чтобы они отображались здесь.
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Добавить первый материал
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Подсчет символов в поле "О себе"
+    document.addEventListener('DOMContentLoaded', function() {
+        const bioTextarea = document.getElementById('bio');
+        const bioCounter = document.getElementById('bioCounter');
+        const bioLength = document.getElementById('bioLength');
+
+        if (bioTextarea) {
+            // Обновляем счетчик при вводе
+            bioTextarea.addEventListener('input', function() {
+                const length = this.value.length;
+                bioLength.textContent = length;
+
+                // Меняем цвет если превышен лимит
+                if (length > 1000) {
+                    bioCounter.classList.remove('text-muted');
+                    bioCounter.classList.add('text-danger');
+                } else {
+                    bioCounter.classList.remove('text-danger');
+                    bioCounter.classList.add('text-muted');
+                }
+            });
+
+            // Инициализируем счетчик
+            bioTextarea.dispatchEvent(new Event('input'));
+        }
+
+        // Предупреждение при попытке уйти со страницы без сохранения
+        const form = document.getElementById('profileForm');
+        let formChanged = false;
+
+        if (form) {
+            const formInputs = form.querySelectorAll('input, textarea, select');
+
+            formInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    formChanged = true;
+                });
+
+                // Для текстовых полей отслеживаем ввод
+                if (input.type === 'text' || input.tagName === 'TEXTAREA') {
+                    const initialValue = input.value;
+                    input.addEventListener('input', function() {
+                        if (this.value !== initialValue) {
+                            formChanged = true;
+                        }
+                    });
+                }
+            });
+
+            // При отправке формы сбрасываем флаг
+            form.addEventListener('submit', function() {
+                formChanged = false;
+            });
+
+            // Предупреждение при попытке уйти
+            window.addEventListener('beforeunload', function(e) {
+                if (formChanged) {
+                    e.preventDefault();
+                    e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
+                }
+            });
+        }
+
+        // Предпросмотр аватара перед загрузкой
+        const avatarInput = document.getElementById('avatar');
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Проверяем размер файла (макс 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Файл слишком большой. Максимальный размер: 2 MB.');
+                        this.value = '';
+                        return;
+                    }
+
+                    // Проверяем тип файла
+                    if (!file.type.startsWith('image/')) {
+                        alert('Пожалуйста, выберите изображение (JPG, PNG, GIF).');
+                        this.value = '';
+                        return;
+                    }
+
+                    // Показываем превью
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        // Создаем или находим контейнер для превью
+                        let previewContainer = document.getElementById('avatarPreview');
+                        if (!previewContainer) {
+                            previewContainer = document.createElement('div');
+                            previewContainer.id = 'avatarPreview';
+                            previewContainer.className = 'mt-3';
+                            avatarInput.parentNode.appendChild(previewContainer);
+                        }
+
+                        previewContainer.innerHTML = `
+                            <p class="mb-1 small text-muted">Предпросмотр:</p>
+                            <img src="${event.target.result}"
+                                 alt="Превью аватара"
+                                 class="img-thumbnail"
+                                 style="max-width: 100px; max-height: 100px;">
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

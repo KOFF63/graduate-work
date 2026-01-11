@@ -1,0 +1,68 @@
+/* Основные стили */
+.subject-card {
+    transition: transform 0.2s;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.subject-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.material-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+/* Карточки материалов */
+.material-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.material-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Цвета для типов материалов */
+.pdf-card {
+    border-left-color: #dc3545;
+}
+
+.video-card {
+    border-left-color: #0d6efd;
+}
+
+.text-card {
+    border-left-color: #198754;
+}
+
+.presentation-card {
+    border-left-color: #6f42c1;
+}
+
+.link-card {
+    border-left-color: #fd7e14;
+}
+
+/* Иконки */
+.type-icon {
+    font-size: 1.5rem;
+    margin-right: 8px;
+}
+
+/* Утилиты */
+.text-purple {
+    color: #6f42c1;
+}

@@ -1,0 +1,62 @@
+/* Легкий бежевый фон для всего сайта */
+body {
+    background-color: #f8f4e9;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+/* Карточки на белом фоне с тенями */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e9e1d1;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Навигация остается синей */
+.navbar {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+}
+
+/* Футер светлый */
+footer {
+    background-color: #f0ebe0 !important;
+    border-top: 1px solid #e9e1d1;
+}
+
+/* Кнопки с бежевыми оттенками */
+.btn-outline-primary {
+    color: #8b7355;
+    border-color: #8b7355;
+}
+
+.btn-outline-primary:hover {
+    background-color: #8b7355;
+    border-color: #8b7355;
+    color: white;
+}
+
+/* Цвета для типов материалов (приглушенные) */
+.pdf-card {
+    border-left-color: #c44536;
+    background: linear-gradient(to right, #fff5f5, white);
+}
+
+.video-card {
+    border-left-color: #4a6fa5;
+    background: linear-gradient(to right, #f0f7ff, white);
+}
+
+.text-card {
+    border-left-color: #5a8c5a;
+    background: linear-gradient(to right, #f0fff4, white);
+}
+
+.presentation-card {
+    border-left-color: #8a4ebf;
+    background: linear-gradient(to right, #f9f0ff, white);
+}
+
+.link-card {
+    border-left-color: #e67e22;
+    background: linear-gradient(to right, #fff9f0, white);
+}
