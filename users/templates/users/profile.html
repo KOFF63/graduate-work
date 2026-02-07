@@ -229,7 +229,6 @@
                             </small>
                         </div>
                     </div>
-
                     <!-- Роль -->
                     <div class="mb-4">
                         <label for="role" class="form-label">
@@ -237,13 +236,13 @@
                         </label>
                         <select class="form-select" id="role" name="role">
                             <option value="student" {% if user.userprofile.role == 'student' %}selected{% endif %}>
-                            👨‍🎓 Студент
+                                👨‍🎓 Студент
                             </option>
                             <option value="teacher" {% if user.userprofile.role == 'teacher' %}selected{% endif %}>
-                            👨‍🏫 Преподаватель
+                                👨‍🏫 Преподаватель
                             </option>
                             <option value="other" {% if user.userprofile.role == 'other' or not user.userprofile.role %}selected{% endif %}>
-                            👤 Другое
+                                👤 Другое
                             </option>
                         </select>
                         <div class="form-text">
@@ -286,9 +285,15 @@
                     <i class="bi bi-folder"></i> Мои материалы
                     <span class="badge bg-primary rounded-pill ms-2">{{ materials_count }}</span>
                 </h5>
-                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">
+                {% if user.is_superuser %}
+                <a href="{% url 'add_material' %}" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus-circle"></i> Добавить материал
                 </a>
+                {% else %}
+                <button class="btn btn-sm btn-outline-secondary" disabled title="Только для администраторов">
+                    <i class="bi bi-plus-circle"></i> Добавить материал
+                </button>
+                {% endif %}
             </div>
             <div class="card-body">
                 {% if user_materials %}

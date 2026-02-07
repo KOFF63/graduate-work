@@ -1,4 +1,6 @@
 {% extends 'materials/base.html' %}
+{% load video_tags %}
+{% load static %}
 
 {% block title %}{{ subject.name }} - Учебные материалы{% endblock %}
 
@@ -37,44 +39,371 @@
         <h3 class="mb-3">Материалы ({{ materials.count }})</h3>
 
         {% for material in materials %}
-        <div class="card mb-3">
+        <div class="card mb-3 shadow-sm hover-lift">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h5 class="card-title">{{ material.title }}</h5>
-                        <p class="card-text">{{ material.description }}</p>
-                        <div class="d-flex gap-3 text-muted small">
-                            <span>Тип: {{ material.get_material_type_display }}</span>
-                            <span>Добавлен: {{ material.upload_date|date:"d.m.Y" }}</span>
-                            <span>Автор:
-    {% if material.uploaded_by.first_name or material.uploaded_by.last_name %}
-        {{ material.uploaded_by.first_name }} {{ material.uploaded_by.last_name }}
-    {% else %}
-        {{ material.uploaded_by.username }}
-    {% endif %}
-</span>
+                    <div class="flex-grow-1">
+                        <!-- Заголовок материала -->
+                        <h5 class="card-title mb-2">
+                            <span class="type-icon me-2">
+                                {% if material.material_type == 'pdf' %}
+                                <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                {% elif material.material_type == 'video' %}
+                                <i class="bi bi-camera-video text-info"></i>
+                                {% elif material.material_type == 'text' %}
+                                <i class="bi bi-file-text text-primary"></i>
+                                {% elif material.material_type == 'presentation' %}
+                                <i class="bi bi-easel text-warning"></i>
+                                {% elif material.material_type == 'other' %}
+                                <i class="bi bi-link-45deg text-secondary"></i>
+                                {% else %}
+                                <i class="bi bi-file-earmark text-muted"></i>
+                                {% endif %}
+                            </span>
+
+                            <span class="text-dark fw-bold">{{ material.title }}</span>
+                        </h5>
+
+                        <!-- Описание материала -->
+                        {% if material.description %}
+                        <p class="card-text text-muted mb-3">
+                            {{ material.description|truncatewords:30 }}
+                        </p>
+                        {% endif %}
+
+                        <!-- КНОПКИ И ВИДЕО-ПРЕВЬЮ -->
+                        <div class="mt-3">
+                            <!-- Проверяем тип ссылки -->
+                            {% with video_type=material.external_link|get_video_type %}
+
+                            <!-- RuTube видео -->
+                            {% if video_type == 'rutube' %}
+                            <div class="video-preview mb-3">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <i class="bi bi-play-btn me-2"></i> Видео с RuTube
+                                        </span>
+                                        <small>
+                                            <i class="bi bi-rutube"></i>
+                                        </small>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="{{ material.external_link|get_rutube_embed_url }}"
+                                                    frameborder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowfullscreen
+                                                    loading="lazy"
+                                                    title="Видео: {{ material.title }}">
+                                            </iframe>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{{ material.external_link }}"
+                                               class="btn btn-sm btn-outline-dark"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                <i class="bi bi-box-arrow-up-right"></i> Открыть на RuTube
+                                            </a>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary copy-btn"
+                                                    data-link="{{ material.external_link }}"
+                                                    title="Скопировать ссылку">
+                                                <i class="bi bi-clipboard"></i> Копировать
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Видео файл (прямая ссылка на .mp4 и т.д.) -->
+                            {% elif video_type == 'file' %}
+                            <div class="video-preview mb-3">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-info text-white">
+                                        <i class="bi bi-file-play me-2"></i> Видео файл
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="ratio ratio-16x9 bg-dark">
+                                            <video controls
+                                                   preload="metadata"
+                                                   class="w-100 h-100"
+                                                   style="object-fit: contain;">
+                                                <source src="{{ material.external_link }}" type="video/mp4">
+                                                Ваш браузер не поддерживает видео тег.
+                                                <a href="{{ material.external_link }}">Скачайте видео</a>
+                                            </video>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{{ material.external_link }}"
+                                               class="btn btn-sm btn-success"
+                                               download>
+                                                <i class="bi bi-download"></i> Скачать видео
+                                            </a>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary copy-btn"
+                                                    data-link="{{ material.external_link }}"
+                                                    title="Скопировать ссылку">
+                                                <i class="bi bi-clipboard"></i> Копировать
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Обычная ссылка (не видео) -->
+                            {% else %}
+                            <div class="d-flex gap-2">
+                                <!-- Кнопка для внешней ссылки -->
+                                {% if material.external_link %}
+                                <a href="{{ material.external_link }}"
+                                   class="btn btn-primary btn-sm"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   title="Открыть внешнюю ссылку">
+                                    <i class="bi bi-box-arrow-up-right"></i> Открыть ссылку
+                                </a>
+                                {% endif %}
+
+                                <!-- Кнопка для скачивания файла -->
+                                {% if material.file %}
+                                <a href="{{ material.file.url }}"
+                                   class="btn btn-success btn-sm"
+                                   download
+                                   title="Скачать файл">
+                                    <i class="bi bi-download"></i> Скачать файл
+                                </a>
+                                {% endif %}
+
+                                <!-- Кнопка копирования ссылки -->
+                                {% if material.external_link %}
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm copy-btn"
+                                        data-link="{{ material.external_link }}"
+                                        title="Скопировать ссылку">
+                                    <i class="bi bi-clipboard"></i> Копировать
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {% endwith %}
                         </div>
+                        <!-- КОНЕЦ КНОПОК И ВИДЕО-ПРЕВЬЮ -->
+
+                        <!-- Теги -->
                         {% if material.tags %}
-                        <div class="mt-2">
-                            {% for tag in material.tags.split %}
-                            <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        <div class="mb-3 mt-3">
+                            <small class="text-muted me-2"><i class="bi bi-tags"></i> Теги:</small>
+                            {% for tag in material.tags.split|slice:":5" %}
+                            <span class="badge bg-light text-dark border me-1 mb-1">
+                                <i class="bi bi-tag"></i> {{ tag }}
+                            </span>
                             {% endfor %}
                         </div>
                         {% endif %}
+
+                        <!-- Мета информация -->
+                        <div class="text-muted small mt-3">
+                            <div class="d-flex flex-wrap gap-3">
+                                <span title="Тип материала">
+                                    <i class="bi bi-tag"></i> {{ material.get_material_type_display }}
+                                </span>
+                                <span title="Дата добавления">
+                                    <i class="bi bi-calendar"></i> {{ material.upload_date|date:"d.m.Y" }}
+                                </span>
+                                <span title="Автор">
+                                    <i class="bi bi-person"></i>
+                                    {% if material.uploaded_by.first_name or material.uploaded_by.last_name %}
+                                        {{ material.uploaded_by.first_name }} {{ material.uploaded_by.last_name }}
+                                    {% else %}
+                                        {{ material.uploaded_by.username }}
+                                    {% endif %}
+                                </span>
+                                <span title="Просмотры">
+                                    <i class="bi bi-eye"></i> {{ material.views }}
+                                </span>
+                                {% if material.file %}
+                                <span title="Скачивания">
+                                    <i class="bi bi-download"></i> {{ material.downloads }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <span class="badge bg-primary fs-6">{{ material.material_type }}</span>
+
+                    <!-- Бейдж типа материала (сбоку) -->
+                    <div class="ms-3">
+                        <span class="badge bg-primary rounded-pill">
+                            {{ material.get_material_type_display }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
             {% if current_filter %}
-            Нет материалов типа "{{ current_filter }}" для этого предмета.
+                Нет материалов с типом "{{ current_filter }}"
             {% else %}
-            Пока нет материалов для этого предмета.
+                В этом предмете пока нет материалов
             {% endif %}
         </div>
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Функция копирования ссылки
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const link = this.getAttribute('data-link');
+
+                // Пытаемся использовать современный API
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(link)
+                        .then(() => showCopySuccess(this))
+                        .catch(() => copyFallback(link, this));
+                } else {
+                    copyFallback(link, this);
+                }
+            });
+        });
+
+        // Функция показа успешного копирования
+        function showCopySuccess(button) {
+            const originalHTML = button.innerHTML;
+            const originalClass = button.className;
+
+            button.innerHTML = '<i class="bi bi-check"></i> Скопировано!';
+            button.className = originalClass.replace('btn-outline-secondary', 'btn-success');
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.className = originalClass;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        // Fallback для старых браузеров
+        function copyFallback(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(button);
+                }
+            } catch (err) {
+                console.error('Не удалось скопировать: ', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Улучшение видео плееров
+        const videos = document.querySelectorAll('.video-preview video');
+        videos.forEach(video => {
+            // Автопауза при скролле
+            let isPlaying = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (isPlaying) {
+                            video.play().catch(e => console.log('Автовоспроизведение заблокировано'));
+                        }
+                    } else {
+                        if (!video.paused) {
+                            video.pause();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(video);
+
+            // Отслеживаем состояние воспроизведения
+            video.addEventListener('play', () => isPlaying = true);
+            video.addEventListener('pause', () => isPlaying = false);
+        });
+    });
+</script>
+
+<style>
+    /* Стили для карточек */
+    .hover-lift {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+        border-color: rgba(13, 110, 253, 0.2);
+    }
+
+    /* Стили для видео превью */
+    .video-preview .card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .video-preview .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+
+    /* Соотношение сторон 16:9 */
+    .ratio-16x9 {
+        --bs-aspect-ratio: 56.25%;
+    }
+
+    /* Адаптивность iframe */
+    .video-preview iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* Стили для видео плеера */
+    .video-preview video {
+        background-color: #000;
+    }
+
+    /* Иконка RuTube с градиентом */
+    .bi-rutube {
+        background: linear-gradient(135deg, #FF0000, #FF4500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 768px) {
+        .video-preview {
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+
+        .video-preview .card {
+            border-radius: 0;
+        }
+    }
+</style>
 {% endblock %}

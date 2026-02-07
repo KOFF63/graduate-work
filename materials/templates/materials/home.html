@@ -1,64 +1,145 @@
-{% extends 'materials/base.html' %}
+{% extends "materials/base.html" %}
+
+{% block title %}Учебные материалы - Главная{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12 text-center mb-5">
-        <h1 class="display-4">Добро пожаловать в систему учебных материалов</h1>
-        <p class="lead">Найдите все необходимые материалы для обучения</p>
+<div class="container py-5">
+    <!-- Заголовок -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-mortarboard"></i>
+            Учебные материалы
+        </h1>
+        <p class="lead">
+            Единая платформа для хранения и обмена учебными материалами.
+        </p>
+        <p class="text-muted">
+            Находите, изучайте, делитесь знаниями.
+        </p>
     </div>
-</div>
 
-<!-- Предметы -->
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="mb-4">Предметы</h2>
-        <div class="row">
-            {% for subject in subjects %}
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card subject-card h-100 text-center">
-                    <div class="card-body">
-                        <div class="material-icon">{{ subject.icon }}</div>
-                        <h5 class="card-title">{{ subject.name }}</h5>
-                        <p class="card-text text-muted small">{{ subject.description|truncatewords:8 }}</p>
-                        <a href="{% url 'subject_materials' subject.id %}" class="btn btn-outline-primary">Смотреть материалы</a>
-                    </div>
+    <!-- Статистика -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="display-4 text-primary">{{ subjects.count|default:0 }}</div>
+                    <div class="text-muted">Предметов</div>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">
-                    Пока нет предметов. Добавьте их через админку.
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="display-4 text-success">{{ total_materials|default:0 }}</div>
+                    <div class="text-muted">Материалов</div>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
-</div>
 
-<!-- Последние материалы -->
-<div class="row">
-    <div class="col-12">
-        <h2 class="mb-4">Последние материалы</h2>
-        {% for material in recent_materials %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">{{ material.title }}</h5>
-                <p class="card-text">{{ material.description }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
-                        {{ material.subject.name }} •
-                        {{ material.get_material_type_display }} •
-                        {{ material.upload_date|date:"d.m.Y" }}
-                    </small>
-                    <span class="badge bg-primary">{{ material.material_type }}</span>
+    <!-- Поиск -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-body p-4">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-search"></i> Найдите нужный материал
+            </h5>
+            <form method="get" action="{% url 'search_materials' %}">
+                <div class="input-group">
+                    <input type="text"
+                           name="q"
+                           class="form-control"
+                           placeholder="Введите тему, предмет, ключевые слова...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Поиск
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Предметы -->
+    <h2 class="mb-4">
+        <i class="bi bi-book"></i> Учебные предметы
+    </h2>
+
+    <div class="row g-4 mb-5">
+        {% for subject in subjects %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-3 mb-3">{{ subject.get_icon_display|default:subject.icon }}</div>
+                    <h5 class="card-title">{{ subject.name }}</h5>
+                    <p class="card-text text-muted small">{{ subject.description|truncatewords:10 }}</p>
+                    <a href="{% url 'subject_materials' subject.id %}" class="btn btn-primary btn-sm">
+                        Материалы
+                    </a>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="alert alert-info">
-            Пока нет материалов. Добавьте их через админку.
+        <div class="col-12">
+            <div class="alert alert-info">
+                Пока нет учебных предметов
+            </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Новые материалы -->
+    <h2 class="mb-4">
+        <i class="bi bi-clock-history"></i> Новые материалы
+    </h2>
+
+    <div class="row g-4">
+        {% for material in recent_materials %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">{{ material.title }}</h6>
+                    <p class="card-text small text-muted">{{ material.description|truncatewords:15 }}</p>
+                    <div class="d-flex justify-content-between">
+                        <span class="badge bg-primary">{{ material.subject.name }}</span>
+                        <small class="text-muted">{{ material.upload_date|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Пока нет материалов
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Панель администратора (только для админов) -->
+    {% if user.is_staff or user.is_superuser %}
+    <div class="card border-warning mt-5">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-gear"></i> Панель администратора
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'admin:index' %}" class="btn btn-warning w-100">
+                        <i class="bi bi-speedometer2"></i> Админ панель
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'admin:materials_subject_changelist' %}" class="btn btn-outline-warning w-100">
+                        <i class="bi bi-book"></i> Управление предметами
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'admin:materials_material_changelist' %}" class="btn btn-outline-warning w-100">
+                        <i class="bi bi-file-earmark-text"></i> Управление материалами
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

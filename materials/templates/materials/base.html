@@ -16,85 +16,288 @@
     <link rel="stylesheet" href="{% static 'materials/css/main.css' %}">
     <link rel="stylesheet" href="{% static 'materials/css/animations.css' %}">
     <link rel="stylesheet" href="{% static 'materials/css/themes.css' %}">
+<!--    <link rel="stylesheet" href="{% static 'materials/css/background.css' %}">-->
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-mortarboard"></i> Учебные материалы
-            </a>
+<!-- Навигация -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <!-- Логотип и название сайта -->
+        <a class="navbar-brand text-primary fw-bold" href="{% url 'home' %}">
+    <i class="bi bi-mortarboard"></i> Учебные материалы
+</a>
 
-            <!-- Поиск -->
+        <!-- Кнопка для мобильного меню -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Основное меню -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Поиск (слева) -->
             <div class="navbar-nav me-auto">
                 <form method="get" action="{% url 'search_materials' %}" class="d-flex">
-                    <input type="text" name="q" class="form-control me-2"
-                           placeholder="Поиск материалов..." value="{{ request.GET.q }}">
+                    <input type="text"
+                           name="q"
+                           class="form-control me-2"
+                           placeholder="Поиск материалов..."
+                           value="{{ request.GET.q }}"
+                           aria-label="Поиск материалов">
                     <button class="btn btn-light" type="submit">
                         <i class="bi bi-search"></i> Найти
                     </button>
                 </form>
             </div>
 
-            <!-- Пользователь -->
+            <!-- Пользователь и навигация (справа) -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <span class="nav-link text-white">
-                        <i class="bi bi-person-circle"></i>
-                        {% if user.userprofile.display_name %}
-                            {{ user.userprofile.display_name }}
-                        {% else %}
-                            {{ user.username }}
-                        {% endif %}
-                    </span>
-                    <a class="nav-link" href="{% url 'profile' %}">
-                        <i class="bi bi-person"></i> Профиль
-                    </a>
-                    <a class="nav-link" href="{% url 'logout' %}">
-                        <i class="bi bi-box-arrow-right"></i> Выйти
-                    </a>
+                <!-- Приветствие с отображаемым именем -->
+                <span class="nav-link text-white">
+                            <i class="bi bi-person-circle"></i>
+                            {% if user.userprofile.display_name %}
+                                {{ user.userprofile.display_name }}
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
+                        </span>
+
+                <!-- Ссылка на добавление материала (ТОЛЬКО ДЛЯ АДМИНОВ) -->
+                {% if user.is_superuser %}
+                <a class="nav-link" href="{% url 'add_material' %}" title="Добавить новый учебный материал">
+                    <i class="bi bi-plus-circle"></i> Добавить материал
+                </a>
+                {% endif %}
+
+                <!-- Ссылка на профиль пользователя -->
+                <a class="nav-link" href="{% url 'profile' %}" title="Мой профиль">
+                    <i class="bi bi-person"></i> Профиль
+                </a>
+
+                <!-- Кнопка выхода -->
+                <a class="nav-link" href="{% url 'logout' %}" title="Выйти из системы">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </a>
                 {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">
-                        <i class="bi bi-box-arrow-in-right"></i> Войти
-                    </a>
-                    <a class="nav-link" href="{% url 'register' %}">
-                        <i class="bi bi-person-plus"></i> Регистрация
-                    </a>
+                <!-- Ссылки для неавторизованных пользователей -->
+                <a class="nav-link" href="{% url 'login' %}" title="Войти в систему">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти
+                </a>
+                <a class="nav-link" href="{% url 'register' %}" title="Зарегистрироваться">
+                    <i class="bi bi-person-plus"></i> Регистрация
+                </a>
                 {% endif %}
             </div>
         </div>
-    </nav>
-
-    <!-- Основной контент -->
-    <div class="container mt-4 animate-fade-in">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
     </div>
+</nav>
 
-    <!-- Подвал -->
-    <footer class="text-center py-4 mt-5">
-        <div class="container">
-            <p class="mb-0 text-muted">
-                <i class="bi bi-c-circle"></i> Система учебных материалов {% now "Y" %}
-            </p>
+<!-- Основной контент -->
+<div class="container mt-4 animate-fade-in">
+    <!-- Сообщения системы -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                {% if message.tags == 'success' %}
+                <i class="bi bi-check-circle-fill fs-4"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="bi bi-exclamation-circle-fill fs-4"></i>
+                {% elif message.tags == 'info' %}
+                <i class="bi bi-info-circle-fill fs-4"></i>
+                {% else %}
+                <i class="bi bi-bell-fill fs-4"></i>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                {{ message }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
         </div>
-    </footer>
+    </div>
+    {% endfor %}
+    {% endif %}
 
-    <!-- Скрипты -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    {% load static %}
-    <script src="{% static 'materials/js/main.js' %}"></script>
-
-    {% block scripts %}
+    <!-- Содержимое страницы -->
+    {% block content %}
     {% endblock %}
+</div>
+
+<!-- Подвал сайта -->
+<footer class="py-4 mt-5">
+    <div class="container">
+        <!-- Белый овал для контента футера -->
+        <div class="bg-white rounded-4 p-4 shadow-lg" style="border-radius: 30px !important;">
+            <div class="row align-items-center">
+                <!-- Лого и название -->
+                <div class="col-lg-4 mb-3 mb-lg-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-mortarboard fs-3 text-primary me-3"></i>
+                        <div>
+                            <h5 class="text-dark mb-1 fw-bold">Учебные материалы</h5>
+                            <small class="text-muted">Дипломный проект</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Копирайт -->
+                <div class="col-lg-4 mb-3 mb-lg-0 text-center">
+                    <p class="text-dark mb-0">
+                        <i class="bi bi-c-circle"></i> Система учебных материалов {% now "Y" %}
+                    </p>
+                    <small class="text-muted">
+                        Для студентов и преподавателей
+                    </small>
+                </div>
+
+                <!-- Ссылки -->
+                <div class="col-lg-4 text-lg-end">
+                    <div class="d-flex justify-content-center justify-content-lg-end gap-3">
+                        <a href="https://github.com/KOFF63/graduate-work"
+                           class="text-dark text-decoration-none d-flex align-items-center fw-medium"
+                           target="_blank">
+                            <i class="bi bi-github fs-5 me-2"></i> GitHub
+                        </a>
+                        <a href="#" class="text-dark text-decoration-none d-flex align-items-center fw-medium">
+                            <i class="bi bi-envelope fs-5 me-2"></i> Контакты
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Разделитель -->
+            <hr class="my-3">
+
+            <!-- Дополнительная информация -->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <small class="text-muted">
+                        Система управления учебными материалами | Версия 1.0
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Скрипты -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% load static %}
+<script src="{% static 'materials/js/main.js' %}"></script>
+
+<!-- Дополнительные скрипты страниц -->
+{% block scripts %}
+{% endblock %}
+
+<!-- Скрипт для работы мобильного меню -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Активируем все всплывающие подсказки
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Закрытие меню на мобильных устройствах при клике на пункт
+        var navbarLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        var navbarToggler = document.querySelector('.navbar-toggler');
+        var navbarCollapse = document.querySelector('.navbar-collapse');
+
+        navbarLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 992) { // На мобильных
+                    var bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                        toggle: false
+                    });
+                    bsCollapse.hide();
+                }
+            });
+        });
+    });
+</script>
+<style>
+    body {
+        background-image: url('{% static "materials/images/9ade-s.jpg" %}');
+        background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    /* УБРАТЬ полностью белый слой */
+    /* body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.88);
+        z-index: -1;
+    } */
+
+    .container {
+        background-color: rgba(255, 255, 255, 0.95); /* Сделать менее прозрачным */
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    /* Увеличить прозрачность карточек */
+    .card {
+        background-color: rgba(255, 255, 255, 0.98);
+    }
+</style>
+<style>
+    /* Кастомная навигация */
+    .navbar {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-bottom: 2px solid #0d6efd;
+    }
+
+    /* Название сайта - синий градиент */
+    .navbar-brand {
+        background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    /* Ссылки в навигации */
+    .navbar-nav .nav-link {
+        color: #495057 !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #0d6efd !important;
+        transform: translateY(-2px);
+    }
+
+    /* Кнопка поиска */
+    .navbar .btn-light {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+
+    .navbar .btn-light:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+</style>
+
 </body>
 </html>

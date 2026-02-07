@@ -1,0 +1,209 @@
+{% extends 'materials/base.html' %}
+
+{% block title %}Учебные Материалы - Добро пожаловать{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Герой-секция -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-4">
+            <i class="bi bi-journal-bookmark"></i>
+            Учебные Материалы
+        </h1>
+        <p class="lead fs-4 text-muted mb-4">
+            Единая платформа для хранения и обмена учебными материалами
+        </p>
+        
+        <!-- Статистика -->
+        <div class="row justify-content-center g-4 mb-5">
+            <div class="col-md-4 col-sm-6">
+                <div class="card border-0 shadow-lg hover-shadow">
+                    <div class="card-body py-4">
+                        <div class="display-5 fw-bold text-primary mb-2">
+                            {{ subject_count }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                            <i class="bi bi-book me-2"></i>Учебных предметов
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="card border-0 shadow-lg hover-shadow">
+                    <div class="card-body py-4">
+                        <div class="display-5 fw-bold text-success mb-2">
+                            {{ material_count }}
+                        </div>
+                        <div class="text-uppercase text-muted small">
+                            <i class="bi bi-file-earmark me-2"></i>Учебных материалов
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Призыв к действию -->
+        <div class="card shadow-lg border-0 mb-5 bg-gradient-primary text-white">
+            <div class="card-body p-5">
+                <h2 class="h1 mb-4">
+                    <i class="bi bi-door-open me-3"></i>Присоединяйтесь к сообществу
+                </h2>
+                <p class="lead mb-4 opacity-75">
+                    Получите доступ к тысячам учебных материалов, лекциям, практическим заданиям 
+                    и другим полезным ресурсам от преподавателей и студентов.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5 py-3 fw-bold">
+                        <i class="bi bi-person-plus me-2"></i>Начать бесплатно
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5 py-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Войти в систему
+                    </a>
+                </div>
+                
+                <p class="mt-4 small opacity-75">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Регистрация займет менее 2 минут
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Преимущества -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3">
+                        <span class="display-4 text-primary">
+                            <i class="bi bi-search"></i>
+                        </span>
+                    </div>
+                    <h4 class="text-center mb-3">Умный поиск</h4>
+                    <p class="text-muted text-center">
+                        Находите нужные материалы по предметам, тегам, ключевым словам 
+                        или даже по содержанию файлов
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3">
+                        <span class="display-4 text-success">
+                            <i class="bi bi-folder2-open"></i>
+                        </span>
+                    </div>
+                    <h4 class="text-center mb-3">Упорядоченная система</h4>
+                    <p class="text-muted text-center">
+                        Все материалы распределены по предметам, семестрам и типам для 
+                        максимально удобного поиска и навигации
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3">
+                        <span class="display-4 text-info">
+                            <i class="bi bi-people"></i>
+                        </span>
+                    </div>
+                    <h4 class="text-center mb-3">Активное сообщество</h4>
+                    <p class="text-muted text-center">
+                        Присоединяйтесь к сообществу студентов и преподавателей, 
+                        делитесь знаниями и находите единомышленников
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Частые вопросы -->
+    <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-4">
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Часто задаваемые вопросы
+            </h3>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Как получить доступ к материалам?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Для доступа ко всем материалам необходимо зарегистрироваться 
+                            и войти в систему. Регистрация бесплатна и занимает всего 
+                            несколько минут.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Кто может загружать материалы?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Все авторизованные пользователи могут загружать материалы 
+                            после проверки модератором. Это помогает поддерживать 
+                            качество контента на платформе.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Какие типы файлов поддерживаются?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Поддерживаются PDF, DOC, DOCX, PPT, PPTX, ZIP, а также 
+                            изображения в форматах JPG, PNG. Максимальный размер 
+                            файла — 50 МБ.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+.hover-lift {
+    transition: transform 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-3px);
+}
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+}
+</style>
+{% endblock %}
