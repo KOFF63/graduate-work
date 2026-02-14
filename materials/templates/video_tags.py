@@ -20,7 +20,7 @@ def is_rutube_video(url):
     for pattern in rutube_patterns:
         match = re.search(pattern, url, re.IGNORECASE)
         if match:
-            return match.group(1)  # Возвращаем ID видео
+            return match.group(1)
 
     return False
 
