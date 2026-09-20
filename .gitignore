@@ -38,3 +38,16 @@ allure-report/
 # OS
 .DS_Store
 Thumbs.db
+
+# Backups
+backup.json
+backup_db.sqlite3
+
+# Search index
+search_index.pkl
+
+# Media files
+media/
+
+# IDE
+.idea/
