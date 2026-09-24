@@ -26,12 +26,25 @@ except Exception as e:
 
 @pytest.fixture
 def driver(request):
-    """Фикстура для Selenium WebDriver с поддержкой скриншотов Allure"""
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    """Фикстура для Selenium WebDriver с поддержкой headless в CI"""
+    options = webdriver.ChromeOptions()
+
+    # Для CI (GitHub Actions) — headless режим
+    if os.getenv('CI'):
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
+
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options
+    )
     driver.maximize_window()
     yield driver
 
-    # Если тест упал — делаем скриншот
+    # Скриншот при падении
     if hasattr(request.node, 'rep_call') and request.node.rep_call.failed:
         try:
             allure.attach(
